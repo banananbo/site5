@@ -28,6 +28,8 @@ services:
       # 本番環境用設定
       - "traefik.http.routers.web-prod.rule=Host(`banananbo.com`)"
       - "traefik.http.routers.web-prod.entrypoints=web"
+      - "traefik.http.routers.web-prod.middlewares=redirect-to-https@docker"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.web-prod-secure.rule=Host(`banananbo.com`)"
       - "traefik.http.routers.web-prod-secure.entrypoints=websecure"
       - "traefik.http.routers.web-prod-secure.tls=true"
