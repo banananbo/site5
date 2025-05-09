@@ -18,6 +18,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/conf:/etc/traefik
       - ./traefik/certs:/etc/certs
+      - ./traefik/acme:/acme
     restart: unless-stopped
 
   web:
@@ -27,6 +28,10 @@ services:
       # 本番環境用設定
       - "traefik.http.routers.web-prod.rule=Host(`banananbo.com`)"
       - "traefik.http.routers.web-prod.entrypoints=web"
+      - "traefik.http.routers.web-prod-secure.rule=Host(`banananbo.com`)"
+      - "traefik.http.routers.web-prod-secure.entrypoints=websecure"
+      - "traefik.http.routers.web-prod-secure.tls=true"
+      - "traefik.http.routers.web-prod-secure.tls.certresolver=letsencrypt"
       # 開発環境用設定
       - "traefik.http.routers.web-dev.rule=Host(`lvh.me`)"
       - "traefik.http.routers.web-dev.entrypoints=web"
