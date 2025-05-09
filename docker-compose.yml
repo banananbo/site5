@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
 
   web:
-    image: nginx:alpine
+    build: ./react-app
     labels:
       - "traefik.enable=true"
       # 本番環境用設定
@@ -39,6 +39,4 @@ services:
       - "traefik.http.routers.web-dev.entrypoints=web"
       # 共通設定
       - "traefik.http.services.web.loadbalancer.server.port=80"
-    volumes:
-      - ./web/html:/usr/share/nginx/html
     restart: unless-stopped 
