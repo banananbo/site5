@@ -20,6 +20,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    
+    // Auth0 Java SDK
+    implementation("com.auth0:auth0:1.42.0")
+    implementation("com.auth0:mvc-auth-commons:1.7.0")
+    
+    // MySQL Connector
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("mysql:mysql-connector-java:8.0.30")
+    
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
