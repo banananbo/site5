@@ -6,7 +6,7 @@
 
 - **本番環境**: banananbo.com
 - **開発環境**: lvh.me
-- **使用技術**: Docker, Docker Compose, Traefik v2, Nginx
+- **使用技術**: Docker, Docker Compose, Traefik v2, Nginx, Kotlin, Spring Boot
 
 ## セットアップ
 
@@ -28,8 +28,11 @@ docker-compose logs -f
 
 ## 動作確認
 
-- 開発環境: http://lvh.me/ にアクセス
-- 本番環境: http://banananbo.com/ にアクセス
+- Webアプリケーション (開発環境): http://lvh.me/ にアクセス
+- Webアプリケーション (本番環境): http://banananbo.com/ にアクセス
+- Kotlin API (開発環境): http://api.lvh.me/api/hello にアクセス
+- Kotlin API (本番環境): http://api.banananbo.com/api/hello にアクセス
+- Kotlin API ヘルスチェック: http://api.lvh.me/health にアクセス
 - Traefik ダッシュボード: http://localhost:8080/ にアクセス
 
 ## プロジェクト構造
@@ -43,12 +46,16 @@ docker-compose logs -f
 │   │   └── dynamic/          # 動的設定
 │   │       └── tls.yml       # TLS設定
 │   └── certs/                # 証明書保存用
-└── web/                      # Webアプリケーション
-    └── html/                 # 静的ファイル
-        └── index.html        # デモページ
+├── web/                      # Webアプリケーション
+│   └── html/                 # 静的ファイル
+│       └── index.html        # デモページ
+└── kotlin-api/               # Kotlin/Spring Boot API
+    ├── src/                  # ソースコード
+    ├── build.gradle.kts      # Gradleビルド設定
+    └── Dockerfile            # Dockerビルド設定
 ```
 
 ## 注意事項
 
 - 本番環境では、適切なTLS証明書の設定が必要です
-- このデモでは、HTTPのみを使用しています。HTTPSを有効にするには追加の設定が必要です 
+- 本番環境では、適切なセキュリティ設定を行ってください 
