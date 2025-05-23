@@ -18,7 +18,7 @@ class AuthController(private val authService: AuthService) {
      * Auth0ログインURLを生成するエンドポイント
      * @return Auth0の認証ページへのURL
      */
-    @GetMapping("/login")
+    @GetMapping("/login_url")
     fun login(): LoginUrlResponse {
         val authorizationUrl = authService.createAuthorizationUrl()
         return LoginUrlResponse(authorizationUrl)
