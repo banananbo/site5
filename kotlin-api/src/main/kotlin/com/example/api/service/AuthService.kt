@@ -44,6 +44,7 @@ class AuthService(private val authAPI: AuthAPI) {
         // トークンレスポンスを生成
         return TokenResponse(
             accessToken = holder.accessToken,
+            idToken = holder.idToken,
             expiresIn = holder.expiresIn
         )
     }

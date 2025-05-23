@@ -1,0 +1,62 @@
+# ログイン・ログアウト手順まとめ（Kotlin + Spring Boot + React SPA）
+
+## 1. ログインフロー
+
+### 1-1. ログインURL取得
+- **エンドポイント**: `GET /api/auth/login_url`
+- **概要**: 認証プロバイダ（Auth0）のログインページURLを取得し、SPA側でリダイレクトする
+- **レスポンス例**:
+  ```json
+  { "authorizationUrl": "https://auth.example.com/authorize?..." }
+  ```
+
+### 1-2. 認証コード受け取り・トークン交換
+- **エンドポイント**: `POST /api/auth/code`
+- **概要**: 認証プロバイダからリダイレクトされた後、認証コードを受け取り、トークン（id_token, access_token）に交換
+- **リクエスト例**:
+  ```json
+  { "code": "xxxx" }
+  ```
+- **レスポンス例**:
+  ```json
+  { "result": "ok" }
+  ```
+- **備考**: サーバー側でid_tokenをHttpOnly, SecureなCookieにセット
+
+### 1-3. ログイン状態・ユーザー情報取得
+- **エンドポイント**: `GET /api/me`
+- **概要**: Cookieからid_tokenを取得し、JWTデコードしてユーザー情報（sub, name, emailなど）を返す
+- **レスポンス例**:
+  ```json
+  {
+    "sub": "auth0|xxxx",
+    "name": "ユーザー名",
+    "email": "user@example.com"
+  }
+  ```
+- **備考**: id_tokenが無い/不正な場合は401エラー
+
+
+## 2. ログアウトフロー
+
+### 2-1. ログアウトAPI呼び出し
+- **エンドポイント**: `POST /api/auth/logout`
+- **概要**: Cookieのid_tokenを削除し、Auth0のログアウトURL（logoutUrl）を返す
+- **レスポンス例**:
+  ```json
+  { "logoutUrl": "https://auth.example.com/v2/logout?client_id=...&returnTo=..." }
+  ```
+
+### 2-2. フロントエンドでAuth0ログアウトURLへリダイレクト
+- **概要**: `/api/auth/logout` のレスポンスで受け取った `logoutUrl` にSPA側でリダイレクトすることで、Auth0からもログアウトされる
+
+
+## 3. セキュリティ・実装上の注意
+- id_tokenはHttpOnly, Secure属性付きCookieで管理し、JSから直接アクセス不可とする
+- CookieのSameSite属性は`Lax`または`Strict`を推奨
+- ログイン状態の判定やユーザー情報取得は `/api/me` でサーバー側でJWTデコードして行う
+- ログアウト時は必ずAuth0のログアウトURLにも遷移する
+
+---
+
+この手順で、SPAとAPIサーバー間で安全かつシンプルな認証・認可フローを実現できます。 

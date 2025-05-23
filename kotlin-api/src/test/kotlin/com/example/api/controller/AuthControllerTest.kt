@@ -15,8 +15,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.test.context.TestPropertySource
 
 @WebMvcTest(AuthController::class)
+@TestPropertySource(locations = ["classpath:application-test.properties"])
 class AuthControllerTest {
     @Autowired
     lateinit var mockMvc: MockMvc
@@ -38,9 +40,9 @@ class AuthControllerTest {
     }
 
     @Test
-    fun `exchangeCode endpoint returns token response`() {
+    fun `exchangeCode endpoint returns ok result`() {
         val code = "test-code"
-        val tokenResponse = TokenResponse(accessToken = "access-token", expiresIn = 3600)
+        val tokenResponse = TokenResponse(accessToken = "access-token", idToken = "id-token", expiresIn = 3600)
         Mockito.`when`(authService.exchangeCodeForToken(code)).thenReturn(tokenResponse)
 
         val request = AuthCodeRequest(code = code)
@@ -50,7 +52,17 @@ class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.accessToken").value("access-token"))
-            .andExpect(jsonPath("$.expiresIn").value(3600))
+            .andExpect(jsonPath("$.result").value("ok"))
+    }
+
+    @Test
+    fun `logout endpoint deletes cookie and returns logoutUrl`() {
+        val expectedLogoutUrl = "https://auth.example.com/v2/logout?client_id=test-client-id&returnTo=https://app.example.com/after-logout"
+        // application.properties等で値を上書きするか、@ValueをMockBeanで差し替える場合は追加実装が必要
+
+        mockMvc.perform(post("/api/auth/logout"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.logoutUrl").value(expectedLogoutUrl))
+            .andExpect(cookie().maxAge("id_token", 0))
     }
 } 
