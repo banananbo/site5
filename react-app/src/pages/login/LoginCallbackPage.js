@@ -6,10 +6,8 @@ import { useNavigate } from 'react-router-dom'; // リダイレクト用
 // import { api } from './App';
 
 // 新しいaxiosインスタンスを作成するか、App.jsから渡す
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '',
-  withCredentials: true,
-});
+// const api = axios.create({ ... }); // services/api.jsに移動
+import api from 'services/api'; // services/api をインポート
 
 
 function LoginCallbackPage() {
