@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # ログイン・ログアウト手順まとめ（Kotlin + Spring Boot + React SPA）
 
 ## 1. ログインフロー

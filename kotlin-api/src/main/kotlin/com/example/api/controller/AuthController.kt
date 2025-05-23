@@ -24,6 +24,8 @@ class AuthController(private val authService: AuthService) {
     private lateinit var auth0ClientId: String
     @Value("\${auth0.logoutRedirectUri}")
     private lateinit var logoutRedirectUri: String
+    @Value("\${cookie.secure:true}")
+    private var cookieSecure: Boolean = true
 
     /**
      * Auth0ログインURLを生成するエンドポイント
@@ -47,7 +49,7 @@ class AuthController(private val authService: AuthService) {
         // id_tokenをCookieにセット
         val cookie = Cookie("id_token", token.idToken)
         cookie.isHttpOnly = true
-        cookie.secure = true
+        cookie.secure = cookieSecure
         cookie.path = "/"
         cookie.maxAge = 60 * 60 // 1時間（必要に応じて調整）
         response.addCookie(cookie)
@@ -63,7 +65,7 @@ class AuthController(private val authService: AuthService) {
     fun logout(response: HttpServletResponse): ResponseEntity<Map<String, String>> {
         val cookie = Cookie("id_token", null)
         cookie.isHttpOnly = true
-        cookie.secure = true
+        cookie.secure = cookieSecure
         cookie.path = "/"
         cookie.maxAge = 0 // 即時削除
         response.addCookie(cookie)
