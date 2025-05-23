@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ # docker-compose システム構造・運用まとめ
+
+## システム全体像
+
+本システムは、以下の4つの主要サービスで構成されています。
+
+- **traefik**: リバースプロキシ・ルーティング・SSL終端
+- **web**: フロントエンド（Reactアプリ）
+- **api**: バックエンドAPI（Kotlin/Spring Boot）
+- **mysql**: データベース（MySQL 8.0）
+
+各サービスはDockerコンテナとして起動し、`docker-compose.yml` で一括管理されます。
+
+---
+
+## サービス詳細
+
+### 1. traefik
+- 役割: リバースプロキシ、SSL証明書管理、ルーティング
+- ポート: 80, 443, 8080 (ダッシュボード)
+- 設定: `./traefik/conf` などをマウント
+- Dockerラベルで各サービスのルーティングを制御
+
+### 2. web
+- 役割: フロントエンド（React）
+- ビルド元: `./react-app`
+- ポート: 80（内部）
+- Traefik経由で `banananbo.com` や `lvh.me` などにルーティング
+
+### 3. api
+- 役割: バックエンドAPI（Kotlin/Spring Boot）
+- ビルド元: `./kotlin-api`
+- ポート: 8081（内部）
+- Traefik経由で `api.banananbo.com` や `api.lvh.me` などにルーティング
+- 環境変数でDBやAuth0の設定を注入
+- `mysql` サービスに依存
+
+### 4. mysql
+- 役割: データベース
+- イメージ: `mysql:8.0`
+- ポート: 3306
+- データ永続化: `mysql_data` ボリューム
+- 初期化スクリプト: `./mysql/init` をマウント
+
+---
+
+## 起動・停止コマンド
+
+```sh
+docker-compose up -d   # バックグラウンドで全サービス起動
+docker-compose down    # 全サービス停止
+```
+
+## よく使う操作
+- ログ確認: `docker-compose logs <サービス名>`
+- サービス再起動: `docker-compose restart <サービス名>`
+- DBデータ永続化: `volumes.mysql_data` を利用
+
+## ドメイン・ルーティング例
+- `banananbo.com` → web（本番）
+- `lvh.me` → web（開発）
+- `api.banananbo.com` → api（本番）
+- `api.lvh.me` → api（開発）
+
+## 環境変数
+- 認証情報やDB接続情報は `.env` ファイルで一元管理
+
+---
+
+## 補足
+- Traefikの設定や証明書は `traefik/` ディレクトリで管理
+- サービス追加・削除は `docker-compose.yml` を編集
+
+---
