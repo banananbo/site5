@@ -3,21 +3,22 @@ import 'styles/App.css';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from 'routes/AppRoutes';
 import useAuth from 'hooks/useAuth';
+import TopBar from 'components/layout/TopBar';
 
 function App() {
   const { user, authLoading, handleLogin, handleLogout } = useAuth();
 
   return (
     <BrowserRouter>
-      <div className="App">
-        <h1>Auth0 ログインデモ</h1>
+      <TopBar />
+      <main className="mainContent">
         <AppRoutes
           user={user}
           authLoading={authLoading}
           handleLogin={handleLogin}
           handleLogout={handleLogout}
         />
-      </div>
+      </main>
     </BrowserRouter>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // リダイレクト用
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // App.jsからaxiosインスタンスを流用する場合
 // import { api } from './App';
@@ -9,35 +9,42 @@ import { useNavigate } from 'react-router-dom'; // リダイレクト用
 // const api = axios.create({ ... }); // services/api.jsに移動
 import api from 'services/api'; // services/api をインポート
 
-
 function LoginCallbackPage() {
-  const navigate = useNavigate(); // リダイレクト用のフック
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     
+    // ローカルストレージから保存されていた遷移先のパスを取得
+    const redirectPath = localStorage.getItem('loginRedirectPath') || '/';
+    // 使用後は削除
+    localStorage.removeItem('loginRedirectPath');
+    
     if (code) {
       api
         .post("/api/auth/code", { code })
         .then(() => {
-          // 認証成功後、ルートパスにリダイレクト
-          // window.history.replaceState({}, document.title, "/"); // これは不要になる
-          navigate('/', { replace: true }); // 履歴を置き換えてリダイレクト
+          // 保存されていたパスに遷移
+          navigate(redirectPath, { replace: true });
         })
         .catch(error => {
           console.error("Error exchanging code:", error);
-          // エラー時もルートパスなどにリダイレクト（エラー表示などはお好みで）
-          navigate('/', { replace: true });
+          navigate(redirectPath, { replace: true });
         });
     } else {
-      // codeがない場合（不正なアクセスなど）もルートパスにリダイレクト
-      navigate('/', { replace: true });
+      navigate(redirectPath, { replace: true });
     }
-  }, [navigate]); // navigateを依存配列に追加
+  }, [navigate]);
 
-  // 処理中はローディング表示など
-  return <div>ログイン処理中です...</div>;
+  return (
+    <div className="loginCallback">
+      <div className="loadingMessage">
+        ログイン処理中です...
+      </div>
+    </div>
+  );
 }
 
 export default LoginCallbackPage; 

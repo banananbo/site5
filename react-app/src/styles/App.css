@@ -61,3 +61,17 @@ h1 {
     transform: rotate(360deg);
   }
 }
+
+.mainContent {
+  margin-top: 64px; /* TopBarの高さ分のマージン */
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px); /* 最小高さを設定 */
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    margin-top: 56px; /* モバイルでのTopBarの高さ分のマージン */
+    padding: 1rem;
+    min-height: calc(100vh - 56px);
+  }
+}

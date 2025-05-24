@@ -15,6 +15,7 @@ const api = axios.create({
 
 function LoginCallbackPage() {
   const navigate = useNavigate(); // リダイレクト用のフック
+  const location = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
