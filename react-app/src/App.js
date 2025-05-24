@@ -2,14 +2,25 @@ import React from 'react';
 import 'styles/App.css';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from 'routes/AppRoutes';
-import useAuth from 'hooks/useAuth';
 import TopBar from 'components/layout/TopBar';
+import { AuthProvider } from 'contexts/AuthContext';
+import { useAuthContext } from 'contexts/AuthContext';
 
 function App() {
-  const { user, authLoading, handleLogin, handleLogout } = useAuth();
-
   return (
     <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
+
+function AppContent() {
+  const { user, authLoading, handleLogin, handleLogout } = useAuthContext();
+
+  return (
+    <>
       <TopBar />
       <main className="mainContent">
         <AppRoutes
@@ -19,7 +30,7 @@ function App() {
           handleLogout={handleLogout}
         />
       </main>
-    </BrowserRouter>
+    </>
   );
 }
 

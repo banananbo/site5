@@ -1,7 +1,9 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from 'pages/home/HomePage'; // 作成したHomePageコンポーネントをインポート
 import LoginCallbackPage from 'pages/login/LoginCallbackPage';
+import DashboardPage from 'pages/dashboard/DashboardPage';
+import UserProfilePage from 'pages/user/UserProfilePage';
 
 function AppRoutes({
   user,
@@ -15,20 +17,45 @@ function AppRoutes({
       <Route
         path="/"
         element={
-          <HomePage
-            user={user}
-            authLoading={authLoading}
-            handleLogin={handleLogin}
-            handleLogout={handleLogout}
-          />
+          user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <HomePage
+              user={user}
+              authLoading={authLoading}
+              handleLogin={handleLogin}
+              handleLogout={handleLogout}
+            />
+          )
         }
       />
       {/* 認証コールバックパス */}
       <Route path="/login_callback" element={<LoginCallbackPage />} />
+      
+      {/* ダッシュボード */}
+      <Route
+        path="/dashboard"
+        element={
+          <DashboardPage
+            user={user}
+            authLoading={authLoading}
+          />
+        }
+      />
 
-      {/* 他のパスも必要に応じて追加 */}
-      {/* <Route path="/about" element={<AboutPage />} /> */}
-      {/* <Route path="*" element={<div>404 Not Found</div>} /> */}
+      {/* ユーザープロフィール */}
+      <Route
+        path="/profile"
+        element={
+          <UserProfilePage
+            user={user}
+            authLoading={authLoading}
+          />
+        }
+      />
+
+      {/* 404ページ */}
+      <Route path="*" element={<div>404 Not Found</div>} />
     </Routes>
   );
 }
