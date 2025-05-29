@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.Cookie
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.web.bind.annotation.CookieValue
 
 @RestController
 @RequestMapping("/api/auth")
@@ -62,17 +63,31 @@ class AuthController(private val authService: AuthService) {
      * Cookieのid_tokenを削除し、Auth0のログアウトURLを返す
      */
     @PostMapping("/logout")
-    fun logout(response: HttpServletResponse): ResponseEntity<Map<String, String>> {
+    fun logout(
+        @CookieValue("id_token", required = false) idToken: String?,
+        response: HttpServletResponse
+    ): ResponseEntity<Map<String, String>> {
+        // Cookieを削除
         val cookie = Cookie("id_token", null)
         cookie.isHttpOnly = true
         cookie.secure = cookieSecure
         cookie.path = "/"
         cookie.maxAge = 0 // 即時削除
         response.addCookie(cookie)
+
         // Auth0ログアウトURLを生成
-        val auth0LogoutUrl = "https://$auth0Domain/v2/logout" +
-            "?client_id=$auth0ClientId" +
-            "&returnTo=$logoutRedirectUri"
+        val auth0LogoutUrl = buildString {
+            append("https://$auth0Domain/v2/logout")
+            append("?client_id=$auth0ClientId")
+            append("&returnTo=$logoutRedirectUri")
+            // id_tokenがある場合は追加（完全なログアウトのため）
+            if (!idToken.isNullOrBlank()) {
+                append("&id_token_hint=$idToken")
+            }
+            // フェデレーションログアウトを有効化
+            append("&federated")
+        }
+
         return ResponseEntity.ok(mapOf("logoutUrl" to auth0LogoutUrl))
     }
 } 
